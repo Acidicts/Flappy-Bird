@@ -15,7 +15,7 @@ bird1 = pygame.surface.Surface((18, 12))
 bird1.fill((0, 0, 0))
 bird1.blit(Bird, (0, 0))
 bird1.set_colorkey((0, 0, 0))
-Bird = pygame.transform.scale(bird1, (72,48))
+Bird = pygame.transform.scale(bird1, (72, 48))
 Pipe = load_image("pipe.png")
 
 def game_over():
@@ -28,6 +28,11 @@ def game_over():
             wait = pygame.time.get_ticks()
         if (pygame.time.get_ticks() - wait) > 5000:
             break
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
     main()
 
 def generate_pipes():
@@ -50,6 +55,7 @@ def main():
     pipe_x, pipe_x2, pipe_height, pipe_height2 = generate_pipes()
 
     while running:
+        bird_rect = pygame.Rect(100, Bird_y, Bird.get_width(), Bird.get_height())
         win.fill((120, 180, 255))
         win.blit(Bird, (100, Bird_y))
         clock.tick(30)
@@ -99,17 +105,20 @@ def main():
 
             bird_rect = pygame.Rect(100, Bird_y, Bird.get_width(), Bird.get_height())
             pipe_rect_top = pygame.Rect(pipe_x, 0, Pipe.get_width(), pipe_height)
-            pipe_rect_bottom = pygame.Rect(pipe_x, pipe_height + gap, Pipe.get_width(), win.get_height() - pipe_height - gap)
+            pipe_rect_bottom = pygame.Rect(pipe_x, pipe_height + gap, Pipe.get_width(),
+                                           win.get_height() - pipe_height - gap)
 
-            if bird_rect.colliderect(pipe_rect_top) or bird_rect.colliderect(pipe_rect_bottom):
-                game_over()
+            if abs(100 - pipe_x) < Bird.get_width() + Pipe.get_width():
+                if bird_rect.colliderect(pipe_rect_bottom):
+                    game_over()
 
             pipe_rect_top2 = pygame.Rect(pipe_x2, 0, Pipe.get_width(), pipe_height2)
             pipe_rect_bottom2 = pygame.Rect(pipe_x2, pipe_height2 + gap, Pipe.get_width(),
                                             win.get_height() - pipe_height2 - gap)
 
-            if bird_rect.colliderect(pipe_rect_top2) or bird_rect.colliderect(pipe_rect_bottom2):
-                game_over()
+            if abs(100 - pipe_x2) < Bird.get_width() + Pipe.get_width():
+                if bird_rect.colliderect(pipe_rect_top2) or bird_rect.colliderect(pipe_rect_bottom2):
+                    game_over()
 
             Bird_y += vel
             vel += 1
